@@ -1,7 +1,15 @@
 import Table from "../components/Table";
 import { IProduct, IProductOptions } from "../interfaces/products";
+import Button from "../components/Button";
+import { useState } from "react";
+import Modal from "../components/Modal";
 
 const ProductsPage = () => {
+  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+
+  const onChangeModalVisibility = () =>
+    setIsOpenModal((prevState) => !prevState);
+
   /**
    * Моки
    */
@@ -92,27 +100,38 @@ const ProductsPage = () => {
    * Все кастомно рендерить не стал
    */
   return (
-    <Table
-      data={data}
-      renderCustomHeaderCell={(key) => {
-        if (key === "options") return "Характеристики";
-      }}
-      renderCustomBodyCell={(key, value) => {
-        if (key === "createdAt") {
-          const date = new Date(value as string);
+    <>
+      <Table
+        data={data}
+        renderCustomHeaderCell={(key) => {
+          if (key === "action") return <></>;
 
-          return `
+          if (key === "options") return "Характеристики";
+        }}
+        renderCustomBodyCell={(key, value, row) => {
+          if (key === "createdAt") {
+            const date = new Date(value as string);
+
+            return `
             ${date.getDate().toString().padStart(2, "0")}.${date.getMonth().toString().padStart(2, "0")}.${date.getFullYear()}${" "}
             ${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
-        }
+          }
 
-        if (key === "options") {
-          const optionsData = value as IProductOptions;
+          if (key === "options") {
+            const optionsData = value as IProductOptions;
 
-          return `Size: ${optionsData.size}, Amount: ${optionsData.amount}`;
-        }
-      }}
-    />
+            return `Size: ${optionsData.size}, Amount: ${optionsData.amount}`;
+          }
+
+          if (key === "action") {
+            return <Button onClick={onChangeModalVisibility}>Edit</Button>;
+          }
+        }}
+      />
+      <Modal isOpen={isOpenModal} onClose={onChangeModalVisibility}>
+        <span>Modal</span>
+      </Modal>
+    </>
   );
 };
 

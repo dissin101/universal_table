@@ -11,8 +11,12 @@ type TCellContent = ReactElement | string | null | undefined;
 
 interface ITableProps<T> {
   data: T[];
-  renderCustomHeaderCell?: (key: keyof T) => TCellContent;
-  renderCustomBodyCell?: (key: keyof T, value: T[keyof T]) => TCellContent;
+  renderCustomHeaderCell?: (key: keyof T | "action") => TCellContent;
+  renderCustomBodyCell?: (
+    key: keyof T | "action",
+    value: T[keyof T],
+    row?: T,
+  ) => TCellContent;
 }
 
 const Table = <T,>({
@@ -20,15 +24,18 @@ const Table = <T,>({
   renderCustomHeaderCell,
   renderCustomBodyCell,
 }: ITableProps<T>) => {
-  if (!data.length) return <span>Список пуст</span>;
-
-  const dataKeys = Object.keys(data[0] as Array<keyof T>);
+  const dataKeys = [
+    ...Object.keys(data[0] as Array<keyof T>),
+    "action" as "action",
+  ];
 
   const renderTableCell = (content: TCellContent, key: string) => {
     if (!content) return null;
 
     return <TableCell key={key}>{content}</TableCell>;
   };
+
+  if (!data.length) return <span>Список пуст</span>;
 
   return (
     <TableWrapper>
@@ -51,7 +58,11 @@ const Table = <T,>({
               renderTableCell(
                 renderCustomBodyCell?.(key as keyof T, row[key as keyof T]) !==
                   undefined
-                  ? renderCustomBodyCell(key as keyof T, row[key as keyof T])
+                  ? renderCustomBodyCell(
+                      key as keyof T,
+                      row[key as keyof T],
+                      row,
+                    )
                   : String(row[key as keyof T]),
                 `cell-${rowIndex}-${cellIndex}`,
               ),
