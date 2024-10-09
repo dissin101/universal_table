@@ -20,10 +20,11 @@ export const Content = styled("div")`
   border-radius: 8px;
   display: flex;
   flex-direction: column;
+  padding: 8px;
 `;
 export const CloseButton = styled(Button)`
   border-radius: 4px;
   width: 30px;
   padding: 0;
-  margin: 8px 8px 8px auto;
+  margin: 0 0 8px auto;
 `;

@@ -1,99 +1,31 @@
 import Table from "../components/Table";
 import { IProduct, IProductOptions } from "../interfaces/products";
 import Button from "../components/Button";
-import { useState } from "react";
+import React, { useReducer, useState } from "react";
 import Modal from "../components/Modal";
+import { productReducer, initialState } from "../reducers/productReducer";
 
 const ProductsPage = () => {
+  const [state, dispatch] = useReducer(productReducer, initialState);
+  const [currentProduct, setCurrentProduct] = useState<IProduct | null>(null);
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
 
   const onChangeModalVisibility = () =>
     setIsOpenModal((prevState) => !prevState);
 
-  /**
-   * Моки
-   */
-  const data: IProduct[] = [
-    {
-      id: 14381328,
+  const onClickEditBtn = (product: IProduct) => {
+    setCurrentProduct(product);
+    onChangeModalVisibility();
+  };
 
-      name: "id quis voluptate nostrud",
+  const onClickSaveBtn = () => {
+    if (currentProduct?.name.length === 0) {
+      return alert('Field "name" cannot be empty!');
+    }
 
-      options: {
-        size: "XL",
-
-        amount: 100,
-      },
-
-      active: true,
-
-      createdAt: "1985-08-09T02:10:18.0Z",
-    },
-
-    {
-      id: 26785188,
-
-      name: "esse elit",
-
-      options: {
-        size: "S",
-
-        amount: 10,
-      },
-
-      active: true,
-
-      createdAt: "1956-03-20T08:59:40.0Z",
-    },
-
-    {
-      id: 63878634,
-
-      name: "enim",
-
-      options: {
-        size: "L",
-
-        amount: 20,
-      },
-
-      active: false,
-
-      createdAt: "2016-07-27T16:05:57.0Z",
-    },
-
-    {
-      id: 79901249,
-
-      name: "eu ad",
-
-      options: {
-        size: "XXL",
-
-        amount: 1000,
-      },
-
-      active: true,
-
-      createdAt: "1988-08-20T03:53:24.0Z",
-    },
-
-    {
-      id: 53113051,
-
-      name: "proident ipsum",
-
-      options: {
-        size: "XL",
-
-        amount: 4,
-      },
-
-      active: true,
-
-      createdAt: "2003-01-19T20:09:29.0Z",
-    },
-  ];
+    dispatch({ type: "EDIT_PRODUCT", payload: currentProduct as IProduct });
+    onChangeModalVisibility();
+  };
 
   /**
    * Привел примеры рендеринга кастомных ячеек.
@@ -102,7 +34,7 @@ const ProductsPage = () => {
   return (
     <>
       <Table
-        data={data}
+        data={state.products}
         renderCustomHeaderCell={(key) => {
           if (key === "action") return <></>;
 
@@ -124,13 +56,50 @@ const ProductsPage = () => {
           }
 
           if (key === "action") {
-            return <Button onClick={onChangeModalVisibility}>Edit</Button>;
+            return (
+              <Button onClick={() => onClickEditBtn(row as IProduct)}>
+                Edit
+              </Button>
+            );
           }
         }}
       />
       <Modal isOpen={isOpenModal} onClose={onChangeModalVisibility}>
-        <span>Modal</span>
+        {currentProduct && (
+          <EditProductForm product={currentProduct} onSave={onClickSaveBtn} />
+        )}
       </Modal>
+    </>
+  );
+};
+
+/**
+ * Не стал выносить в отдельный компонент в рамках тестового
+ */
+
+interface IEditProductFormProps {
+  product: IProduct;
+  onSave: (editedProduct: IProduct) => void;
+}
+
+const EditProductForm: React.FC<IEditProductFormProps> = ({
+  product,
+  onSave,
+}) => {
+  const [name, setName] = useState(product.name);
+
+  const onChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setName(e.currentTarget.value);
+  };
+
+  const onClickSaveBtn = () => {
+    onSave({ ...product, name });
+  };
+
+  return (
+    <>
+      <input value={name} onChange={onChangeInput} />
+      <Button onClick={onClickSaveBtn}>Save</Button>
     </>
   );
 };
