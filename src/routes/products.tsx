@@ -18,12 +18,13 @@ const ProductsPage = () => {
     onChangeModalVisibility();
   };
 
-  const onClickSaveBtn = () => {
+  const onClickSaveBtn = (payload: IProduct) => {
+
     if (currentProduct?.name.length === 0) {
       return alert('Field "name" cannot be empty!');
     }
 
-    dispatch({ type: "EDIT_PRODUCT", payload: currentProduct as IProduct });
+    dispatch({ type: "EDIT_PRODUCT", payload });
     onChangeModalVisibility();
   };
 
