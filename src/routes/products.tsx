@@ -1,14 +1,17 @@
 import Table from "../components/Table";
 import { IProduct, IProductOptions } from "../interfaces/products";
 import Button from "../components/Button";
-import React, { useReducer, useState } from "react";
+import React, {useMemo, useReducer, useState} from "react";
 import Modal from "../components/Modal";
 import { productReducer, initialState } from "../reducers/productReducer";
+import EditProductForm from "../modules/products/EditProductForm";
+import FilterProducts from "../modules/products/FilterProducts";
 
 const ProductsPage = () => {
   const [state, dispatch] = useReducer(productReducer, initialState);
   const [currentProduct, setCurrentProduct] = useState<IProduct | null>(null);
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+  const [filterText, setFilterText] = useState<string>("");
 
   const onChangeModalVisibility = () =>
     setIsOpenModal((prevState) => !prevState);
@@ -19,23 +22,25 @@ const ProductsPage = () => {
   };
 
   const onClickSaveBtn = (payload: IProduct) => {
-
-    if (currentProduct?.name.length === 0) {
-      return alert('Field "name" cannot be empty!');
-    }
-
     dispatch({ type: "EDIT_PRODUCT", payload });
     onChangeModalVisibility();
   };
+
+  const filteredProducts = useMemo(() => {
+    return state.products.filter((product) =>
+        product.name.toLowerCase().includes(filterText.toLowerCase())
+    );
+  }, [filterText, state.products]);
 
   /**
    * Привел примеры рендеринга кастомных ячеек.
    * Все кастомно рендерить не стал
    */
   return (
-    <>
+    <div style={{width: 800}}>
+      <FilterProducts onFilter={setFilterText}/>
       <Table
-        data={state.products}
+        data={filteredProducts}
         renderCustomHeaderCell={(key) => {
           if (key === "action") return <></>;
 
@@ -70,38 +75,7 @@ const ProductsPage = () => {
           <EditProductForm product={currentProduct} onSave={onClickSaveBtn} />
         )}
       </Modal>
-    </>
-  );
-};
-
-/**
- * Не стал выносить в отдельный компонент в рамках тестового
- */
-
-interface IEditProductFormProps {
-  product: IProduct;
-  onSave: (editedProduct: IProduct) => void;
-}
-
-const EditProductForm: React.FC<IEditProductFormProps> = ({
-  product,
-  onSave,
-}) => {
-  const [name, setName] = useState(product.name);
-
-  const onChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setName(e.currentTarget.value);
-  };
-
-  const onClickSaveBtn = () => {
-    onSave({ ...product, name });
-  };
-
-  return (
-    <>
-      <input value={name} onChange={onChangeInput} />
-      <Button onClick={onClickSaveBtn}>Save</Button>
-    </>
+    </div>
   );
 };
 
