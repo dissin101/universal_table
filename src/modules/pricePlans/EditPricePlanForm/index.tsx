@@ -6,7 +6,7 @@ import { IPricePlan } from "../../../interfaces/pricePlan";
 
 interface IEditPricePlanFormProps {
   pricePlan: IPricePlan;
-  onSave: (editedProduct: IPricePlan) => void;
+  onSave: (editedPricePlan: IPricePlan) => void;
 }
 
 const EditPricePlanForm: React.FC<IEditPricePlanFormProps> = ({

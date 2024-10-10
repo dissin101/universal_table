@@ -19,8 +19,8 @@ const PricePlansPage = () => {
   const onChangeModalVisibility = () =>
     setIsOpenModal((prevState) => !prevState);
 
-  const onClickEditBtn = (product: IPricePlan) => {
-    setCurrentPricePlan(product);
+  const onClickEditBtn = (price: IPricePlan) => {
+    setCurrentPricePlan(price);
     onChangeModalVisibility();
   };
 

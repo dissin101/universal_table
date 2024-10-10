@@ -3,6 +3,7 @@ import React from "react";
 import ProductsPage from "./products";
 import Layout from "../components/Layout";
 import PricePage from "./pricePlans";
+import Pages from "./pages";
 
 const Routes = () => {
   const router = createBrowserRouter([
@@ -21,6 +22,10 @@ const Routes = () => {
         {
           path: "/price",
           element: <PricePage />,
+        },
+        {
+          path: "/pages",
+          element: <Pages />,
         },
       ],
     },

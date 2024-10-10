@@ -17,7 +17,11 @@ const FilterPricePlans: React.FC<IFilterPricePlansProps> = ({ onFilter }) => {
 
   return (
     <Container>
-      <Input placeholder={"description"} value={description} onChange={onChangeInput} />
+      <Input
+        placeholder={"description"}
+        value={description}
+        onChange={onChangeInput}
+      />
       <Button onClick={onClickFilterButton}>Filter</Button>
     </Container>
   );
