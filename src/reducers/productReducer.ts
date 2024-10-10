@@ -1,4 +1,4 @@
-import { IProduct } from "../interfaces/products";
+import { IProduct } from "../interfaces/product";
 
 type TAction = { type: "EDIT_PRODUCT"; payload: IProduct };
 

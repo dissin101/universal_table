@@ -1,11 +1,12 @@
 import Table from "../components/Table";
-import { IProduct, IProductOptions } from "../interfaces/products";
+import { IProduct, IProductOptions } from "../interfaces/product";
 import Button from "../components/Button";
-import React, {useMemo, useReducer, useState} from "react";
+import React, { useMemo, useReducer, useState } from "react";
 import Modal from "../components/Modal";
 import { productReducer, initialState } from "../reducers/productReducer";
 import EditProductForm from "../modules/products/EditProductForm";
 import FilterProducts from "../modules/products/FilterProducts";
+import { formatDate } from "../utils/date";
 
 const ProductsPage = () => {
   const [state, dispatch] = useReducer(productReducer, initialState);
@@ -28,7 +29,7 @@ const ProductsPage = () => {
 
   const filteredProducts = useMemo(() => {
     return state.products.filter((product) =>
-        product.name.toLowerCase().includes(filterText.toLowerCase())
+      product.name.toLowerCase().includes(filterText.toLowerCase()),
     );
   }, [filterText, state.products]);
 
@@ -37,8 +38,8 @@ const ProductsPage = () => {
    * Все кастомно рендерить не стал
    */
   return (
-    <div style={{width: 800}}>
-      <FilterProducts onFilter={setFilterText}/>
+    <div style={{ width: 800 }}>
+      <FilterProducts onFilter={setFilterText} />
       <Table
         data={filteredProducts}
         renderCustomHeaderCell={(key) => {
@@ -48,11 +49,7 @@ const ProductsPage = () => {
         }}
         renderCustomBodyCell={(key, value, row) => {
           if (key === "createdAt") {
-            const date = new Date(value as string);
-
-            return `
-            ${date.getDate().toString().padStart(2, "0")}.${date.getMonth().toString().padStart(2, "0")}.${date.getFullYear()}${" "}
-            ${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+            return formatDate(value as string);
           }
 
           if (key === "options") {

@@ -1,4 +1,4 @@
-import { IProduct } from "../../../interfaces/products";
+import { IProduct } from "../../../interfaces/product";
 import React, { useState } from "react";
 import Input from "../../../components/Input";
 import Button from "../../../components/Button";
@@ -20,8 +20,8 @@ const EditProductForm: React.FC<IEditProductFormProps> = ({
   };
 
   const onClickSaveBtn = () => {
-    if (!name.length){
-      return alert('Field "name" cannot be empty!')
+    if (!name.length) {
+      return alert('Field "name" cannot be empty!');
     }
 
     onSave({ ...product, name });
