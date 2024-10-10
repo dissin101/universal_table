@@ -13,6 +13,9 @@ const ProductsPage = () => {
   const [currentProduct, setCurrentProduct] = useState<IProduct | null>(null);
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [filterText, setFilterText] = useState<string>("");
+  const [filterStatus, setFilterStatus] = useState<boolean | undefined>(
+    undefined,
+  );
 
   const onChangeModalVisibility = () =>
     setIsOpenModal((prevState) => !prevState);
@@ -28,10 +31,14 @@ const ProductsPage = () => {
   };
 
   const filteredProducts = useMemo(() => {
-    return state.products.filter((product) =>
-      product.name.toLowerCase().includes(filterText.toLowerCase()),
-    );
-  }, [filterText, state.products]);
+    return state.products
+      .filter((product) =>
+        product.name.toLowerCase().includes(filterText.toLowerCase()),
+      )
+      .filter((product) =>
+        filterStatus === undefined ? true : product.active === filterStatus,
+      );
+  }, [filterText, filterStatus, state.products]);
 
   /**
    * Привел примеры рендеринга кастомных ячеек.
@@ -39,7 +46,10 @@ const ProductsPage = () => {
    */
   return (
     <div style={{ width: 800 }}>
-      <FilterProducts onFilter={setFilterText} />
+      <FilterProducts
+        onFilterStatus={setFilterStatus}
+        onFilterName={setFilterText}
+      />
       <Table
         data={filteredProducts}
         renderCustomHeaderCell={(key) => {

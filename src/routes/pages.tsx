@@ -3,7 +3,6 @@ import Button from "../components/Button";
 import React, { useMemo, useReducer, useState } from "react";
 import Modal from "../components/Modal";
 import { formatDate } from "../utils/date";
-import FilterPricePlans from "../modules/pricePlans/FilterPricePlans";
 import { pageReducer, initialState } from "../reducers/pageReducer";
 import { IPage } from "../interfaces/page";
 import EditPageForm from "../modules/pages/EditPageForm";
@@ -14,6 +13,9 @@ const PagesPage = () => {
   const [currentPage, setCurrentPage] = useState<IPage | null>(null);
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [filterText, setFilterText] = useState<string>("");
+  const [filterStatus, setFilterStatus] = useState<boolean | undefined>(
+    undefined,
+  );
 
   const onChangeModalVisibility = () =>
     setIsOpenModal((prevState) => !prevState);
@@ -29,14 +31,21 @@ const PagesPage = () => {
   };
 
   const filteredPricePlans = useMemo(() => {
-    return state.pages.filter((page) =>
-      page.title.toLowerCase().includes(filterText.toLowerCase()),
-    );
-  }, [filterText, state.pages]);
+    return state.pages
+      .filter((page) =>
+        page.title.toLowerCase().includes(filterText.toLowerCase()),
+      )
+      .filter((product) =>
+        filterStatus === undefined ? true : product.active === filterStatus,
+      );
+  }, [filterText, filterStatus, state.pages]);
 
   return (
     <div style={{ width: 900 }}>
-      <FilterPages onFilter={setFilterText} />
+      <FilterPages
+        onFilterTitle={setFilterText}
+        onFilterStatus={setFilterStatus}
+      />
       <Table
         data={filteredPricePlans}
         renderCustomHeaderCell={(key) => {

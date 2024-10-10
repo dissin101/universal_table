@@ -15,6 +15,9 @@ const PricePlansPage = () => {
   );
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [filterText, setFilterText] = useState<string>("");
+  const [filterStatus, setFilterStatus] = useState<boolean | undefined>(
+    undefined,
+  );
 
   const onChangeModalVisibility = () =>
     setIsOpenModal((prevState) => !prevState);
@@ -30,14 +33,21 @@ const PricePlansPage = () => {
   };
 
   const filteredPricePlans = useMemo(() => {
-    return state.pricePlans.filter((pricePlan) =>
-      pricePlan.description.toLowerCase().includes(filterText.toLowerCase()),
-    );
-  }, [filterText, state.pricePlans]);
+    return state.pricePlans
+      .filter((pricePlan) =>
+        pricePlan.description.toLowerCase().includes(filterText.toLowerCase()),
+      )
+      .filter((product) =>
+        filterStatus === undefined ? true : product.active === filterStatus,
+      );
+  }, [filterText, filterStatus, state.pricePlans]);
 
   return (
     <div style={{ width: 900 }}>
-      <FilterPricePlans onFilter={setFilterText} />
+      <FilterPricePlans
+        onFilterDescription={setFilterText}
+        onFilterStatus={setFilterStatus}
+      />
       <Table
         data={filteredPricePlans}
         renderCustomHeaderCell={(key) => {
