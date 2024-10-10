@@ -1,22 +1,17 @@
-import React, { ReactElement } from "react";
+import React from "react";
+import { TableBody, TableHeader, TableRow, TableWrapper } from "./styles";
 import {
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-  TableWrapper,
-} from "./styles";
-
-type TCellContent = ReactElement | string | null | undefined;
+  TActionKey,
+  TRenderCustomBodyCell,
+  TRenderCustomHeaderCell,
+} from "./interface";
+import MemoizedTableCell from "./MemoizedTableCell";
+import MemoizedTableRow from "./MemoizedTableRow";
 
 interface ITableProps<T> {
   data: T[];
-  renderCustomHeaderCell?: (key: keyof T | "action") => TCellContent;
-  renderCustomBodyCell?: (
-    key: keyof T | "action",
-    value: T[keyof T],
-    row?: T,
-  ) => TCellContent;
+  renderCustomHeaderCell?: TRenderCustomHeaderCell<T>;
+  renderCustomBodyCell?: TRenderCustomBodyCell<T>;
 }
 
 const Table = <T,>({
@@ -24,50 +19,38 @@ const Table = <T,>({
   renderCustomHeaderCell,
   renderCustomBodyCell,
 }: ITableProps<T>) => {
+  if (!data.length) return <span>Список пуст</span>;
+
   const dataKeys = [
     ...Object.keys(data[0] as Array<keyof T>),
-    "action" as "action",
+    "action" as TActionKey,
   ];
-
-  const renderTableCell = (content: TCellContent, key: string) => {
-    if (!content) return null;
-
-    return <TableCell key={key}>{content}</TableCell>;
-  };
-
-  if (!data.length) return <span>Список пуст</span>;
 
   return (
     <TableWrapper>
       <TableHeader>
         <TableRow>
-          {dataKeys.map((key, index) =>
-            renderTableCell(
-              renderCustomHeaderCell?.(key as keyof T) !== undefined
-                ? renderCustomHeaderCell(key as keyof T)
-                : key,
-              `header-${key}-${index}`,
-            ),
-          )}
+          {dataKeys.map((key, index) => (
+            <MemoizedTableCell
+              content={
+                renderCustomHeaderCell?.(key as keyof T) !== undefined
+                  ? renderCustomHeaderCell(key as keyof T)
+                  : key
+              }
+              key={`header-${key}-${index}`}
+            />
+          ))}
         </TableRow>
       </TableHeader>
       <TableBody>
         {data.map((row, rowIndex) => (
-          <TableRow key={rowIndex}>
-            {dataKeys.map((key, cellIndex) =>
-              renderTableCell(
-                renderCustomBodyCell?.(key as keyof T, row[key as keyof T]) !==
-                  undefined
-                  ? renderCustomBodyCell(
-                      key as keyof T,
-                      row[key as keyof T],
-                      row,
-                    )
-                  : String(row[key as keyof T]),
-                `cell-${rowIndex}-${cellIndex}`,
-              ),
-            )}
-          </TableRow>
+          <MemoizedTableRow
+            rowIndex={rowIndex}
+            key={rowIndex}
+            dataKeys={dataKeys}
+            renderCustomBodyCell={renderCustomBodyCell}
+            row={row}
+          />
         ))}
       </TableBody>
     </TableWrapper>
